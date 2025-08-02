@@ -4,6 +4,8 @@
     name: "{{ cert_manager_repo_name }}"
     repo_url: "{{ cert_manager_repo_url }}"
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Create cert-manager namespace
   kubernetes.core.k8s:
@@ -14,6 +16,8 @@
       metadata:
         name: "{{ cert_manager_namespace }}"
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Install cert-manager
   kubernetes.core.helm:
@@ -23,6 +27,8 @@
     create_namespace: yes
     values: "{{ cert_manager_values }}"
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Wait for cert-manager to be ready
   kubernetes.core.k8s_info:
@@ -36,6 +42,8 @@
       status: "True"
     wait_timeout: 300
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Create ClusterIssuer for Let's Encrypt
   kubernetes.core.k8s:
@@ -56,3 +64,5 @@
               ingress:
                 class: nginx
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"

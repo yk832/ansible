@@ -4,6 +4,8 @@
     name: "{{ nginx_ingress_repo_name }}"
     repo_url: "{{ nginx_ingress_repo_url }}"
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Update helm repositories
   kubernetes.core.helm:
@@ -13,6 +15,8 @@
     state: absent
     update_repo_cache: yes
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
   ignore_errors: yes
 
 - name: Install nginx-ingress controller
@@ -23,6 +27,8 @@
     create_namespace: yes
     values: "{{ nginx_ingress_values }}"
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
 
 - name: Wait for nginx-ingress to be ready
   kubernetes.core.k8s_info:
@@ -36,3 +42,5 @@
       status: "True"
     wait_timeout: 300
   become_user: "{{ ansible_user }}"
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
