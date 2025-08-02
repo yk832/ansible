@@ -1,0 +1,16 @@
+---
+- name: Install git packages
+  ansible.builtin.package:
+    name: "{{ git_packages }}"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Verify git installation
+  ansible.builtin.command: git --version
+  register: git_version
+  changed_when: false
+
+- name: Display git version
+  ansible.builtin.debug:
+    msg: "Installed Git version: {{ git_version.stdout }}"

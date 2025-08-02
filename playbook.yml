@@ -3,6 +3,11 @@
   hosts: homelab
   become: yes
   tasks:
+    - name: Install Git
+      ansible.builtin.include_role:
+        name: git
+      tags: base, git
+
     - name: Configure K3s
       ansible.builtin.include_role:
         name: k3s
