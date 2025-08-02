@@ -7,6 +7,3 @@ email: your-email@example.com
 k3s_version: v1.32.4+k3s1
 k3s_token: "{{ ansible_hostname }}-token"
 
-# Vaultwarden settings
-vaultwarden_subdomain: vault
-vaultwarden_storage_size: 10Gi

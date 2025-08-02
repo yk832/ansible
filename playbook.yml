@@ -1,5 +1,5 @@
 ---
-- name: Deploy K3s homelab with Vaultwarden
+- name: Deploy K3s homelab infrastructure
   hosts: homelab
   become: yes
   tasks:
@@ -34,8 +34,3 @@
     - name: Force all notified handlers to run at this point, not waiting for normal sync points
       ansible.builtin.meta: flush_handlers
       tags: server, ssl
-      
-    - name: Configure vaultwarden
-      ansible.builtin.include_role:
-        name: vaultwarden
-      tags: server, apps
