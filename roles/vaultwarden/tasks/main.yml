@@ -1,0 +1,118 @@
+---
+- name: Create vaultwarden namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ vaultwarden_namespace }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Create vaultwarden PVC
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: "{{ vaultwarden_pvc_name }}"
+        namespace: "{{ vaultwarden_namespace }}"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ vaultwarden_storage_size }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Deploy vaultwarden
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: vaultwarden
+        namespace: "{{ vaultwarden_namespace }}"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: vaultwarden
+        template:
+          metadata:
+            labels:
+              app: vaultwarden
+          spec:
+            containers:
+            - name: vaultwarden
+              image: "{{ vaultwarden_image }}"
+              ports:
+              - containerPort: 80
+              env:
+              - name: WEBSOCKET_ENABLED
+                value: "true"
+              - name: DOMAIN
+                value: "https://{{ vaultwarden_subdomain }}.{{ domain }}"
+              volumeMounts:
+              - name: vaultwarden-data
+                mountPath: /data
+            volumes:
+            - name: vaultwarden-data
+              persistentVolumeClaim:
+                claimName: "{{ vaultwarden_pvc_name }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Create vaultwarden service
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ vaultwarden_service_name }}"
+        namespace: "{{ vaultwarden_namespace }}"
+      spec:
+        selector:
+          app: vaultwarden
+        ports:
+        - name: http
+          port: 80
+          targetPort: 80
+        - name: websocket
+          port: 3012
+          targetPort: 3012
+  become_user: "{{ ansible_user }}"
+
+- name: Create vaultwarden ingress
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: "{{ vaultwarden_ingress_name }}"
+        namespace: "{{ vaultwarden_namespace }}"
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: "{{ cluster_issuer_name }}"
+          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      spec:
+        tls:
+        - hosts:
+          - "{{ vaultwarden_subdomain }}.{{ domain }}"
+          secretName: "{{ vaultwarden_tls_secret_name }}"
+        rules:
+        - host: "{{ vaultwarden_subdomain }}.{{ domain }}"
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: "{{ vaultwarden_service_name }}"
+                  port:
+                    number: 80
+  become_user: "{{ ansible_user }}"

@@ -1,0 +1,12 @@
+---
+# Global variables for all hosts
+domain: iskang.duckdns.org
+email: your-email@example.com
+
+# K3s settings
+k3s_version: v1.32.4+k3s1
+k3s_token: "{{ ansible_hostname }}-token"
+
+# Vaultwarden settings
+vaultwarden_subdomain: vault
+vaultwarden_storage_size: 10Gi

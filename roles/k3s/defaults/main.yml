@@ -1,0 +1,14 @@
+---
+# K3s role default variables
+k3s_version: v1.32.4+k3s1
+k3s_token: "{{ ansible_hostname }}-token"
+k3s_disable_services:
+  - traefik
+k3s_write_kubeconfig_mode: "644"
+
+# System packages
+required_packages:
+  - curl
+  - wget
+  - git
+  - unzip

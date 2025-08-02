@@ -1,0 +1,56 @@
+---
+- name: Update system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install required packages
+  apt:
+    name: "{{ required_packages }}"
+    state: present
+
+- name: Install K3s
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
+      --token={{ k3s_token }} \
+      --disable={{ k3s_disable_services | join(',') }} \
+      --write-kubeconfig-mode={{ k3s_write_kubeconfig_mode }}
+  args:
+    creates: /usr/local/bin/k3s
+  notify: restart k3s
+
+- name: Wait for K3s to be ready
+  wait_for:
+    port: 6443
+    host: localhost
+    delay: 10
+    timeout: 300
+
+- name: Create .kube directory
+  file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Copy kubeconfig
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+    remote_src: yes
+
+- name: Install kubectl
+  get_url:
+    url: "https://dl.k8s.io/release/v1.32.4/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Install Helm
+  shell: |
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
