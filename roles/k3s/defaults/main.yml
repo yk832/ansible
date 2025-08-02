@@ -12,3 +12,6 @@ required_packages:
   - wget
   - git
   - unzip
+  - python3-pip
+  - python3-kubernetes
+  - python3-yaml

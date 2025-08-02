@@ -16,21 +16,3 @@
     - name: Force all notified handlers to run at this point, not waiting for normal sync points
       ansible.builtin.meta: flush_handlers
       tags: server, k3s
-
-    - name: Configure nginx-ingress
-      ansible.builtin.include_role:
-        name: nginx-ingress
-      tags: server, ingress
-
-    - name: Force all notified handlers to run at this point, not waiting for normal sync points
-      ansible.builtin.meta: flush_handlers
-      tags: server, ingress
-
-    - name: Configure cert-manager
-      ansible.builtin.include_role:
-        name: cert-manager
-      tags: server, ssl
-
-    - name: Force all notified handlers to run at this point, not waiting for normal sync points
-      ansible.builtin.meta: flush_handlers
-      tags: server, ssl
