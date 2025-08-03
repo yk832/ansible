@@ -1,7 +1,7 @@
 ---
 # Global variables for all hosts
 domain: iskang.duckdns.org
-email: your-email@example.com
+email: "{{ vault_email }}"
 
 # K3s settings
 k3s_version: v1.32.4+k3s1

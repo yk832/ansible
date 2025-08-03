@@ -21,3 +21,8 @@
       ansible.builtin.include_role:
         name: nginx-ingress
       tags: server, ingress
+
+    - name: Configure cert-manager
+      ansible.builtin.include_role:
+        name: cert-manager
+      tags: server, ssl
