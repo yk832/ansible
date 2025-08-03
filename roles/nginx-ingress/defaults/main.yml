@@ -1,0 +1,16 @@
+---
+# nginx-ingress role default variables
+nginx_ingress_namespace: nginx-ingress
+nginx_ingress_version: 4.10.1
+nginx_ingress_replica_count: 1
+nginx_ingress_service_type: NodePort
+
+# SSL/TLS configuration
+nginx_ingress_ssl_protocols: "TLSv1.2 TLSv1.3"
+nginx_ingress_ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+
+# Resource limits
+nginx_ingress_cpu_request: "100m"
+nginx_ingress_memory_request: "90Mi"
+nginx_ingress_cpu_limit: "1000m"
+nginx_ingress_memory_limit: "1Gi"

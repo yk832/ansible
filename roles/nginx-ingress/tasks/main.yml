@@ -1,0 +1,62 @@
+---
+- name: Create nginx-ingress namespace
+  kubernetes.core.k8s:
+    name: "{{ nginx_ingress_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+- name: Add nginx-ingress Helm repository
+  kubernetes.core.helm_repository:
+    name: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+- name: Update Helm repositories
+  kubernetes.core.helm:
+    name: dummy
+    release_namespace: default
+    state: absent
+    update_repo_cache: yes
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+- name: Deploy nginx-ingress controller
+  kubernetes.core.helm:
+    name: nginx-ingress
+    chart_ref: ingress-nginx/ingress-nginx
+    release_namespace: "{{ nginx_ingress_namespace }}"
+    create_namespace: true
+    chart_version: "{{ nginx_ingress_version }}"
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+    values:
+      controller:
+        replicaCount: "{{ nginx_ingress_replica_count }}"
+        service:
+          type: "{{ nginx_ingress_service_type }}"
+        resources:
+          requests:
+            cpu: "{{ nginx_ingress_cpu_request }}"
+            memory: "{{ nginx_ingress_memory_request }}"
+          limits:
+            cpu: "{{ nginx_ingress_cpu_limit }}"
+            memory: "{{ nginx_ingress_memory_limit }}"
+        config:
+          ssl-protocols: "{{ nginx_ingress_ssl_protocols }}"
+          ssl-ciphers: "{{ nginx_ingress_ssl_ciphers }}"
+          use-forwarded-headers: "true"
+          compute-full-forwarded-for: "true"
+        admissionWebhooks:
+          enabled: false
+
+- name: Wait for nginx-ingress controller to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: nginx-ingress-ingress-nginx-controller
+    namespace: "{{ nginx_ingress_namespace }}"
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
+    kubeconfig: /home/{{ ansible_user }}/.kube/config

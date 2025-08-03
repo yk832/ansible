@@ -1,0 +1,12 @@
+  # Ansible Vault password file
+.vault_pass
+
+# IDE files
+.idea/
+
+# Backup files
+*.bak
+*~
+
+# Log files
+*.log
