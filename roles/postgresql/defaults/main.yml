@@ -1,0 +1,14 @@
+---
+postgresql_version: "14"
+postgresql_port: 5432
+postgresql_listen_addresses: "*"
+postgresql_max_connections: 100
+
+# Database and user configuration
+postgresql_databases:
+  - name: "{{ postgres_db_name | default('postgres') }}"
+
+# postgresql_users defined in vars/main.yml for higher precedence
+
+# Authentication settings
+postgresql_auth_method: "md5"

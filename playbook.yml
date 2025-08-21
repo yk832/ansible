@@ -26,3 +26,8 @@
       ansible.builtin.include_role:
         name: cert-manager
       tags: server, ssl
+
+    - name: Install and configure PostgreSQL
+      ansible.builtin.import_role:
+        name: postgresql
+      tags: server, database

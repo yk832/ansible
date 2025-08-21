@@ -1,0 +1,6 @@
+---
+# PostgreSQL role variables (higher precedence than defaults)
+postgresql_users:
+  - name: "{{ vault_postgres_username }}"
+    password: "{{ vault_postgres_password }}"
+    role_attr_flags: "CREATEDB,SUPERUSER"
