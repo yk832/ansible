@@ -1,0 +1,20 @@
+bind {{ redis_bind }}
+port {{ redis_port }}
+
+{% if redis_password %}
+requirepass {{ redis_password }}
+{% endif %}
+
+maxmemory {{ redis_maxmemory }}
+maxmemory-policy {{ redis_maxmemory_policy }}
+
+{% for save_rule in redis_save_config %}
+save {{ save_rule }}
+{% endfor %}
+
+appendonly {{ redis_appendonly }}
+appendfsync {{ redis_appendfsync }}
+
+dir /var/lib/redis
+logfile /var/log/redis/redis-server.log
+loglevel notice

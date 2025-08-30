@@ -1,0 +1,28 @@
+---
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: redis
+
+- name: Install Redis packages
+  ansible.builtin.package:
+    name:
+      - redis-server
+      - redis-tools
+    state: present
+  tags: redis
+
+- name: Configure Redis
+  ansible.builtin.template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+    backup: yes
+  notify: restart redis
+  tags: redis
+
+- name: Ensure Redis service is running
+  ansible.builtin.systemd:
+    name: redis-server
+    state: started
+    enabled: yes
+  tags: redis

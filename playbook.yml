@@ -31,3 +31,8 @@
       ansible.builtin.import_role:
         name: postgresql
       tags: server, database
+
+    - name: Install and configure Redis
+      ansible.builtin.include_role:
+        name: redis
+      tags: server, database, redis

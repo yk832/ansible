@@ -1,0 +1,13 @@
+---
+redis_version: "7.2"
+redis_port: 6379
+redis_bind: "127.0.0.1"
+redis_password: ""
+redis_maxmemory: "256mb"
+redis_maxmemory_policy: "allkeys-lru"
+redis_save_config:
+  - "900 1"
+  - "300 10"
+  - "60 10000"
+redis_appendonly: "yes"
+redis_appendfsync: "everysec"
